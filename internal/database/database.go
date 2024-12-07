@@ -15,8 +15,6 @@ func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
 	}
 
 	db.AutoMigrate(&model.User{})
-	db.Exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username) WHERE username != ''`)
-	db.Exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email) WHERE email != ''`)
 
 	return db, nil
 }
