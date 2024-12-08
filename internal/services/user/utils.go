@@ -13,10 +13,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// saltPassword adds salt to password for additional security
 func (s *service) saltPassword(password string) string {
 	return password + s.cfg.AuthPassSalt
 }
 
+// validatePassword validates if provided password matches stored hash
 func (s *service) validatePassword(realPassword []byte, password string) (err *errs.Error) {
 	err2 := bcrypt.CompareHashAndPassword(realPassword, []byte(password))
 	if err2 != nil {
@@ -28,6 +30,7 @@ func (s *service) validatePassword(realPassword []byte, password string) (err *e
 	return nil
 }
 
+// generateToken generates JWT token containing user info and expiry
 func (s *service) generateToken(user *model.User) (userToken *model.UserToken, err *errs.Error) {
 	now := time.Now()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

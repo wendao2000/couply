@@ -1,33 +1,64 @@
-# Couply
+# Couply - Dating App Backend
 
-This project is developed with Clean Architecture in mind and developer's vision from experience working collaboratively with developer's colleague.
+A Go-based dating app backend service built with Clean Architecture principles. This implementation focuses on authentication services, with additional features planned for future development.
 
-## How to run this project
-Simply exec `go run main.go`. This project doesn't require any external dependencies that needs installation, such as DB (this project uses SQLite), and Redis (not enough time to implement).
+## Project Structure
 
-## What does this project provide
-- Sign Up (http://localhost:2025/signup)
-- Sign In (http://localhost:2025/signin)
+This service follows Clean Architecture patterns for clear separation of concerns:
 
-## What does this project "trying" to provide
-- Docker Containerization (Containerized DB / Redis)
-- Refresh Token
-- Device Based Token
-- KYC (for Matching Algorithm)
-- Role / Permission (Free vs Paid User)
-- Get Profile (Self / Potential Match)
-- Matching Algorithm (a.k.a. FYP)
-- Filter Potential Match
-- Push Potential Match to MQ
-- Fetch Potential Match from MQ
-- Swiping / Unswiping (Feedback for Matching Algorithm)
-- Match Notification
-- Chat (using Websocket)
-- Payment (3rd Party Payment Gateway)
+### Directory Layout
 
-## Dependencies used on this project
-- chi/v5 - Router (used for its easy Middleware plug-in)
-- jwt/v5 - JWT library for Golang
-- godotenv - .env Loader
-- go-redis/v9 - Caching (unused)
-- gorm - ORM library for Golang
+```text
+internal/
+  ├── config/       # Configuration and environment setup
+  ├── constants/    # Application constants and test helpers
+  ├── database/     # Database connection and management
+  ├── handlers/     # HTTP request handlers (auth, profile)
+  ├── models/       # Data models and entities
+  ├── redis/        # Redis client setup
+  ├── repositories/ # Data access layer
+  ├── response/     # Standardized API responses
+  └── services/     # Business logic layer
+
+pkg/
+  ├── errs/         # Error handling utilities
+  └── utils/        # Common utilities
+```
+
+## Running the Service
+
+### Prerequisites
+
+- Go 1.21 or higher
+
+### Steps to Run
+
+1. Clone the repository
+
+    ```bash
+    git clone [repository-url]
+    cd couply
+    ```
+
+2. Start the service
+
+    ```bash
+    go run main.go
+    ```
+
+The server will start at `http://localhost:2025`.
+
+### Available Endpoints
+
+- Sign Up: `POST http://localhost:2025/signup`
+- Sign In: `POST http://localhost:2025/signin`
+
+## Dependencies
+
+- **chi/v5**: HTTP routing
+- **jwt/v5**: Authentication
+- **godotenv**: Environment configuration
+- **gorm**: Database ORM
+- **go-redis/v9**: Caching (planned)
+
+The service uses SQLite for development simplicity, requiring no additional database setup.

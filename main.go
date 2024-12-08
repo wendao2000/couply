@@ -28,6 +28,7 @@ func main() {
 		log.Fatal("Failed while initializing config, err:", err)
 	}
 
+	// Initialize database
 	db, err := database.NewDatabase(cfg)
 	if err != nil {
 		log.Fatal("Failed while initializing config, err:", err)
@@ -55,5 +56,10 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	hdlr.RegisterRoutes(r)
-	http.ListenAndServe(":2025", r)
+
+	log.Println("Server is running on port :2025")
+	err = http.ListenAndServe(":2025", r)
+	if err != nil && err != http.ErrServerClosed {
+		log.Fatal(err)
+	}
 }

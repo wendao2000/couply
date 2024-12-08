@@ -10,16 +10,20 @@ import (
 	"github.com/wendao2000/couply/pkg/errs"
 )
 
+// CreateUser creates new user account with email/username and password, returns user data with JWT token
 func (s *service) CreateUser(ctx context.Context, req *model.Auth) (user *model.User, userToken *model.UserToken, err *errs.Error) {
 	if req == nil {
 		log.Println("[CreateUser] Request is nil")
 		return nil, nil, errs.ParamError.WithMessage("Empty request")
 	}
+
 	if len(req.Email) == 0 && len(req.Username) == 0 {
 		log.Println("[CreateUser] Both email and username is empty")
 		return nil, nil, errs.ParamError.WithMessage("Email and/or username cannot be empty")
 	}
+
 	// TODO: validate email format
+
 	if len(req.Password) == 0 {
 		log.Println("[CreateUser] Password is empty")
 		return nil, nil, errs.ParamError.WithMessage("Password cannot be empty")
@@ -44,16 +48,20 @@ func (s *service) CreateUser(ctx context.Context, req *model.Auth) (user *model.
 	return user, userToken, nil
 }
 
+// Authenticate validates user credentials (email/username + password) and returns user data with new JWT token
 func (s *service) Authenticate(ctx context.Context, req *model.Auth) (user *model.User, userToken *model.UserToken, err *errs.Error) {
 	if req == nil {
 		log.Println("[CreateUser] Request is nil")
 		return nil, nil, errs.ParamError.WithMessage("Empty request")
 	}
+
 	if len(req.Email) == 0 && len(req.Username) == 0 {
 		log.Println("[CreateUser] Both email and username is empty")
 		return nil, nil, errs.ParamError.WithMessage("Email and/or username cannot be empty")
 	}
+
 	// TODO: validate email format
+
 	if len(req.Password) == 0 {
 		log.Println("[CreateUser] Password is empty")
 		return nil, nil, errs.ParamError.WithMessage("Password cannot be empty")

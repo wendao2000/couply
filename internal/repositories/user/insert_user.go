@@ -23,8 +23,7 @@ func (r *repository) InsertUser(ctx context.Context, req *InsertUserRequest) (us
 		Password: pwhashed,
 	}
 
-	res := r.db.Create(user)
-	if res.Error != nil {
+	if res := r.db.Create(user); res.Error != nil {
 		if strings.Contains(res.Error.Error(), "UNIQUE constraint failed") {
 			return nil, errs.AuthError.WithMessage("User already exists")
 		}
