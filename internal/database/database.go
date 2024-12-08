@@ -15,6 +15,7 @@ func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
 	}
 
 	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Profile{})
 
 	return db, nil
 }

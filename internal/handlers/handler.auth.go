@@ -6,10 +6,9 @@ import (
 	"net/http"
 
 	model "github.com/wendao2000/couply/internal/models"
-	"github.com/wendao2000/couply/internal/response"
-	"github.com/wendao2000/couply/internal/services/profile"
 
 	"github.com/wendao2000/couply/pkg/errs"
+	"github.com/wendao2000/couply/pkg/response"
 )
 
 // SignUp handles user registration
@@ -33,15 +32,19 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: move to MQ
 	go func() {
-		err := h.profileService.CreateBasicProfile(r.Context(), &profile.BasicProfile{
+		prof, err := h.profileService.CreateBasicProfile(r.Context(), &model.BasicProfile{
 			UserID:      user.ID,
 			Name:        req.Name,
 			DateOfBirth: req.DateOfBirth,
 		})
 		if err != nil {
 			// TODO: push back to MQ
-			log.Println("error while create basic profile, err:", err)
+			log.Println("Failed while create basic profile, err:", err)
+			return
 		}
+
+		// TOOD: push notification to user
+		log.Printf("Successfully created profile, prof: %+v", prof)
 	}()
 
 	// Return success response

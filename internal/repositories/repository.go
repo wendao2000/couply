@@ -15,7 +15,7 @@ type Repository struct {
 
 func InitRepositories(cfg *config.Config, db *gorm.DB) (*Repository, error) {
 	return &Repository{
-		Profile: profile.NewRepository(cfg),
+		Profile: profile.NewRepository(cfg, db),
 		User:    user.NewRepository(cfg, db),
 	}, nil
 }
