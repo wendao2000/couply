@@ -1,0 +1,33 @@
+sequenceDiagram
+   actor User
+   participant UI
+   participant Auth Service
+   participant Payment Service
+   participant Payment DB
+   participant Payment Gateway
+   participant MQ
+   participant Profile Service
+   participant Notifier Service
+
+   User->>UI: Click upgrade to premium
+   UI->>Auth Service: Validate token
+   Auth Service-->>UI: Token valid
+
+   UI->>Payment Service: Initialize payment
+   Payment Service->>Payment Gateway: Create payment intent
+   Payment Gateway-->>Payment Service: Return payment intent
+   Payment Service->>Payment DB: Save pending payment
+   Payment Service-->>UI: Return payment details
+
+   User->>UI: Do payment
+   UI->>Payment Gateway: Process payment
+   Payment Gateway-->>UI: Payment success
+   
+   UI->>Payment Service: Confirm payment
+   Payment Service->>Payment DB: Update payment status
+   Payment Service->>MQ: Publish payment success
+   
+   MQ->>Profile Service: Update premium status
+   MQ->>Notifier Service: Send success notification
+   Notifier Service->>UI: Push SSE notification
+   UI->>User: Show success!

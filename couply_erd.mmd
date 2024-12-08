@@ -1,0 +1,92 @@
+erDiagram
+    users {
+        bigint id PK
+        string email
+        string username
+        string password
+        string phone
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    user_profiles {
+        bigint id PK
+        bigint user_id FK
+        string name
+        string gender
+        date date_of_birth
+        string profile_pic_url
+        text bio
+        json preferences
+        point location
+        point temp_location
+        timestamp last_active_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    user_photos {
+        bigint id PK
+        bigint user_id FK
+        string url
+        int order
+        timestamp uploaded_at
+    }
+
+    swipes {
+        bigint id PK
+        bigint swiper_id FK
+        bigint target_id FK
+        string action
+        timestamp created_at
+    }
+
+    matches {
+        bigint id PK
+        bigint user1_id FK
+        bigint user2_id FK
+        timestamp matched_at
+        timestamp unmatched_at
+    }
+
+    chat_rooms {
+        bigint id PK
+        bigint match_id FK
+        bigint user1_id FK
+        bigint user2_id FK
+        timestamp created_at
+        timestamp last_message_at
+    }
+
+    messages {
+        bigint id PK
+        bigint chat_room_id FK
+        bigint sender_id FK
+        text content
+        timestamp sent_at
+        timestamp edited_at
+        timestamp deleted_at
+        timestamp read_at
+    }
+
+    payments {
+        bigint id PK
+        bigint user_id FK
+        bigint amount_micros
+        string currency
+        string status
+        string payment_method
+        json extend_info
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    users ||--|| user_profiles : "has"
+    users ||--o{ user_photos : "has"
+    users ||--o{ swipes : "makes"
+    users ||--o{ matches : "participates"
+    matches ||--|| chat_rooms : "has"
+    chat_rooms ||--o{ messages : "contains"
+    users ||--o{ chat_rooms : "participates"
+    users ||--o{ messages : "sends"
+    users ||--o{ payments : "makes"

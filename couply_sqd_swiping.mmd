@@ -1,0 +1,50 @@
+sequenceDiagram
+   actor User
+   participant UI
+   participant Auth Service
+   participant Profile Service
+   participant Matchmaker Service
+   participant Matchmaker Redis
+   participant Matchmaker DB
+   participant MQ
+   participant Notifier Service
+   participant Chat Service
+
+   User->>UI: Swipes on profile
+   UI->>Auth Service: Validate token
+   Auth Service-->>UI: Token valid
+
+   UI->>Matchmaker Service: Create swipe
+   Matchmaker Service->>Profile Service: Check premium status
+   
+   alt Not Premium
+       Profile Service-->>Matchmaker Service: Not premium
+       Matchmaker Service->>Matchmaker Redis: Check swipe limit
+       
+       alt Limit Reached
+           Matchmaker Redis-->>Matchmaker Service: Limit reached
+           Matchmaker Service->>MQ: Publish limit reached event
+           MQ->>Notifier Service: Send limit notification
+           Notifier Service->>UI: Push SSE notification
+           UI->>User: Show limit reached!
+       else Under Limit
+           Matchmaker Redis-->>Matchmaker Service: Under limit
+       end
+   else Is Premium User
+       Profile Service-->>Matchmaker Service: Premium active
+   end
+    Matchmaker Service->>Matchmaker DB: Save swipe
+    Matchmaker Service->>MQ: Publish swipe event
+   
+   MQ->>Matchmaker Service: Process potential match
+   
+   alt Is Match
+       Matchmaker Service->>Matchmaker DB: Create match
+       Matchmaker Service->>MQ: Publish match event
+       MQ->>Chat Service: Create chat room
+       MQ->>Notifier Service: Send match notification
+       Notifier Service->>UI: Push SSE notification
+       UI->>User: Show match!
+   else No Match
+       Matchmaker Service->>MQ: Update recommendations
+   end
