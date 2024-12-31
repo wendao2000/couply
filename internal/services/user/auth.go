@@ -8,6 +8,7 @@ import (
 	repoUser "github.com/wendao2000/couply/internal/repositories/user"
 
 	"github.com/wendao2000/couply/pkg/errs"
+	"github.com/wendao2000/couply/pkg/utils"
 )
 
 // CreateUser creates new user account with email/username and password, returns user data with JWT token
@@ -22,7 +23,13 @@ func (s *service) CreateUser(ctx context.Context, req *model.Auth) (user *model.
 		return nil, nil, errs.ParamError.WithMessage("Email and/or username cannot be empty")
 	}
 
-	// TODO: validate email format
+	// validate email format
+	if len(req.Email) > 0 {
+		if !utils.ValidateEmail(req.Email) {
+			log.Println("[CreateUser] Invalid email format")
+			return nil, nil, errs.ParamError.WithMessage("Invalid email")
+		}
+	}
 
 	if len(req.Password) == 0 {
 		log.Println("[CreateUser] Password is empty")
@@ -51,19 +58,25 @@ func (s *service) CreateUser(ctx context.Context, req *model.Auth) (user *model.
 // Authenticate validates user credentials (email/username + password) and returns user data with new JWT token
 func (s *service) Authenticate(ctx context.Context, req *model.Auth) (user *model.User, userToken *model.UserToken, err *errs.Error) {
 	if req == nil {
-		log.Println("[CreateUser] Request is nil")
+		log.Println("[Authenticate] Request is nil")
 		return nil, nil, errs.ParamError.WithMessage("Empty request")
 	}
 
 	if len(req.Email) == 0 && len(req.Username) == 0 {
-		log.Println("[CreateUser] Both email and username is empty")
+		log.Println("[Authenticate] Both email and username is empty")
 		return nil, nil, errs.ParamError.WithMessage("Email and/or username cannot be empty")
 	}
 
-	// TODO: validate email format
+	// validate email format
+	if len(req.Email) > 0 {
+		if !utils.ValidateEmail(req.Email) {
+			log.Println("[Authenticate] Invalid email format")
+			return nil, nil, errs.ParamError.WithMessage("Invalid email")
+		}
+	}
 
 	if len(req.Password) == 0 {
-		log.Println("[CreateUser] Password is empty")
+		log.Println("[Authenticate] Password is empty")
 		return nil, nil, errs.ParamError.WithMessage("Password cannot be empty")
 	}
 
@@ -73,20 +86,20 @@ func (s *service) Authenticate(ctx context.Context, req *model.Auth) (user *mode
 		user, err = s.userRepo.GetUserByUsername(ctx, req.Username)
 	}
 	if err != nil {
-		log.Println("[CreateUser] Failed while getting user from database, err:", err)
+		log.Println("[Authenticate] Failed while getting user from database, err:", err)
 		return nil, nil, err
 	}
 
 	// Validate password
 	err = s.validatePassword(user.Password, s.saltPassword(req.Password))
 	if err != nil {
-		log.Println("[CreateUser] Failed hwile validating user password, err:", err)
+		log.Println("[Authenticate] Failed hwile validating user password, err:", err)
 		return nil, nil, err
 	}
 
 	userToken, err = s.generateToken(user)
 	if err != nil {
-		log.Println("[CreateUser] Failed while generating jwt token, err:", err)
+		log.Println("[Authenticate] Failed while generating jwt token, err:", err)
 		return nil, nil, err
 	}
 
